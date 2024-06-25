@@ -2,25 +2,22 @@ execute in deltatime:calculation run execute store result score b deltatime run 
 tellraw @a[tag=debugtick1] "\n\n------------------------------------------"
 tellraw @a[tag=debugtick1] ["border: ",{"score":{"name": "b","objective": "deltatime"}}]
 # defaults
-# max: 59999968
+# max: 59000001
 # min: 1
 
 # max worldborder
-execute in deltatime:calculation run worldborder set 59999968
+execute in deltatime:calculation run worldborder set 59000001
+scoreboard players set a deltatime 59000001
 
 # min worldborder
 execute in deltatime:calculation run worldborder set 1 10
-
-# max worldborder
-scoreboard players set a deltatime 59999968
-
-# min worldborder
 scoreboard players remove a deltatime 1
 scoreboard players remove b deltatime 1
 
+
 # expected results:
-#  - a = 59999999 m (max)
-#  - b = 5999999 m (current)
+#  - a = 59990000 m (max)
+#  - b = 123456 m (current)
 #  - max = 10 s (max seconds)
 #  - acc = 1000 (accuracy)
 #  - buf = 0 ()
@@ -36,13 +33,13 @@ scoreboard players remove b deltatime 1
 #  - a *= acc
 #  - a -= b
 # d = a
+##OUTPUT: tickdelta = a
 
 ## d + buffer = e
 #  - a += buf
 #  - buf = a
 # e = a
 # e = buf
-##OUTPUT: tickdelta = a
 
 ## e * 20 // acc = f
 #  - b = 20
@@ -60,17 +57,23 @@ scoreboard players remove b deltatime 1
 ##OUTPUT: buffer = buffer
 
 
-#  - 5999999 m // (59999999 m // 1000) = 100 ‰
-#  - 1000 * 50 s - 50 s * 100 ‰ = 90 000 ms
-#  - 90 000 ms + buffer(0 ms) = 90 000 ms
-#  - 90 000 ms * 20 // 1000 = 1800 t
-#  - buffer = 90 000 ms - 1800 t // 20 * 1000
+#  - 123456 m / (59990000 m / 1000) = 2,0579
+#  - 1000 * 10 s - 10 s * 2,0579 = 9 979,421
+#  - 9 979,421 + buffer(0) = 9 979,421
+#  - 9 979,421 * 20 / 1000 = 199,58842
+#  - buffer = 9 979,421 - 199,58842 / 20 * 1000
 
 
-## TESTING LINES! TODO REMOVE
+#  - 123456 m // (59990000 m // 1000) = 2
+#  - 1000 * 10 s - 10 s * 2 = 9 980
+#  - 9 980 + buffer(0) = 9 980
+#  - 9 980 * 20 // 1000 = 199
+#  - buffer = 9 980 - 199 // 20 * 1000
 
-#scoreboard players set a deltatime 59999999
-#scoreboard players set b deltatime 5999999
+
+#testing lines:
+#scoreboard players set a deltatime 59990000
+#scoreboard players set b deltatime 123456
 tellraw @a[tag=debugtick1] ["1: a: ",{"score":{"name": "a","objective": "deltatime"}}," b: ",{"score":{"name": "b","objective": "deltatime"}}]
 
 
@@ -90,15 +93,14 @@ tellraw @a[tag=debugtick1] ["6: a: ",{"score":{"name": "a","objective": "deltati
 scoreboard players operation a deltatime -= b deltatime
 tellraw @a[tag=debugtick1] ["7: a: ",{"score":{"name": "a","objective": "deltatime"}}," b: ",{"score":{"name": "b","objective": "deltatime"}}]
 
+scoreboard players operation tickdelta deltatime = a deltatime
+tellraw @a[tag=debugtick1] ["8: a: ",{"score":{"name": "a","objective": "deltatime"}}," b: ",{"score":{"name": "b","objective": "deltatime"}}]
 
 scoreboard players operation a deltatime += buffer deltatime
-tellraw @a[tag=debugtick1] ["8: a: ",{"score":{"name": "a","objective": "deltatime"}}," b: ",{"score":{"name": "b","objective": "deltatime"}}]
-scoreboard players operation buffer deltatime = a deltatime
 tellraw @a[tag=debugtick1] ["9: a: ",{"score":{"name": "a","objective": "deltatime"}}," b: ",{"score":{"name": "b","objective": "deltatime"}}]
-
-
-scoreboard players operation tickdelta deltatime = a deltatime
+scoreboard players operation buffer deltatime = a deltatime
 tellraw @a[tag=debugtick1] ["A: a: ",{"score":{"name": "a","objective": "deltatime"}}," b: ",{"score":{"name": "b","objective": "deltatime"}}]
+
 
 scoreboard players set b deltatime 20
 tellraw @a[tag=debugtick1] ["B: a: ",{"score":{"name": "a","objective": "deltatime"}}," b: ",{"score":{"name": "b","objective": "deltatime"}}]
